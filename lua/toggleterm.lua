@@ -216,6 +216,7 @@ function M.toggle(count, size, dir, direction)
   else
     smart_toggle(count, size, dir, direction)
   end
+  vim.cmd ":keepalt file Term"
 end
 
 -- Toggle all terminals
