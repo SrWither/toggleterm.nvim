@@ -13,7 +13,7 @@ local SHADING_AMOUNT = constants.shading_amount
 -- Export
 -----------------------------------------------------------
 local M = {
-  __set_highlights = colors.set_highlights,
+  __set_highlights = colors.set_highlights
 }
 
 --- only shade explicitly specified filetypes
@@ -33,15 +33,25 @@ local function setup_global_mappings()
   local mapping = conf.open_mapping
   -- v:count defaults the count to 0 but if a count is passed in uses that instead
   if mapping then
-    api.nvim_set_keymap("n", mapping, '<Cmd>execute v:count . "ToggleTerm"<CR>', {
-      silent = true,
-      noremap = true,
-    })
-    if conf.insert_mappings then
-      api.nvim_set_keymap("i", mapping, "<Esc><Cmd>ToggleTerm<CR>", {
+    api.nvim_set_keymap(
+      "n",
+      mapping,
+      '<Cmd>execute v:count . "ToggleTerm"<CR>',
+      {
         silent = true,
-        noremap = true,
-      })
+        noremap = true
+      }
+    )
+    if conf.insert_mappings then
+      api.nvim_set_keymap(
+        "i",
+        mapping,
+        "<Esc><Cmd>ToggleTerm<CR>",
+        {
+          silent = true,
+          noremap = true
+        }
+      )
     end
   end
 end
@@ -112,20 +122,20 @@ end
 function M.on_term_open()
   local id, term = terms.identify()
   if not term then
-    terms.Terminal
-      :new({
+    terms.Terminal:new(
+      {
         id = id,
         bufnr = api.nvim_get_current_buf(),
         window = api.nvim_get_current_win(),
         job_id = vim.b.terminal_job_id,
-        direction = require("toggleterm.ui").guess_direction(),
-      })
-      :__resurrect()
+        direction = require("toggleterm.ui").guess_direction()
+      }
+    ):__resurrect()
   end
 end
 
 function M.exec_command(args, count)
-  vim.validate({ args = { args, "string" } })
+  vim.validate({args = {args, "string"}})
   if not args:match("cmd") then
     return require("toggleterm.utils").echomsg(
       "TermExec requires a cmd specified using the syntax cmd='ls -l' e.g. TermExec cmd='ls -l'",
@@ -133,14 +143,16 @@ function M.exec_command(args, count)
     )
   end
   local parsed = require("toggleterm.commandline").parse(args)
-  vim.validate({
-    cmd = { parsed.cmd, "string" },
-    size = { parsed.size, "number", true },
-    dir = { parsed.dir, "string", true },
-    direction = { parsed.direction, "string", true },
-    go_back = { parsed.go_back, "boolean", true },
-    open = { parsed.open, "boolean", true },
-  })
+  vim.validate(
+    {
+      cmd = {parsed.cmd, "string"},
+      size = {parsed.size, "number", true},
+      dir = {parsed.dir, "string", true},
+      direction = {parsed.direction, "string", true},
+      go_back = {parsed.go_back, "boolean", true},
+      open = {parsed.open, "boolean", true}
+    }
+  )
   M.exec(parsed.cmd, count, parsed.size, parsed.dir, parsed.direction, parsed.go_back, parsed.open)
 end
 
@@ -152,15 +164,17 @@ end
 --- @param go_back boolean whether or not to return to original window
 --- @param open boolean whether or not to open terminal window
 function M.exec(cmd, num, size, dir, direction, go_back, open)
-  vim.validate({
-    cmd = { cmd, "string" },
-    num = { num, "number", true },
-    size = { size, "number", true },
-    dir = { dir, "string", true },
-    direction = { direction, "string", true },
-    go_back = { go_back, "boolean", true },
-    open = { open, "boolean", true },
-  })
+  vim.validate(
+    {
+      cmd = {cmd, "string"},
+      num = {num, "number", true},
+      size = {size, "number", true},
+      dir = {dir, "string", true},
+      direction = {direction, "string", true},
+      go_back = {go_back, "boolean", true},
+      open = {open, "boolean", true}
+    }
+  )
   num = (num and num >= 1) and num or terms.get_toggled_id()
   open = open == nil or open
   local term, created = terms.get_or_create_term(num, dir, direction)
@@ -186,11 +200,13 @@ end
 
 function M.toggle_command(args, count)
   local parsed = require("toggleterm.commandline").parse(args)
-  vim.validate({
-    size = { parsed.size, "number", true },
-    dir = { parsed.dir, "string", true },
-    direction = { parsed.direction, "string", true },
-  })
+  vim.validate(
+    {
+      size = {parsed.size, "number", true},
+      dir = {parsed.dir, "string", true},
+      direction = {parsed.direction, "string", true}
+    }
+  )
   if parsed.size then
     parsed.size = tonumber(parsed.size)
   end
@@ -209,7 +225,7 @@ end
 --- @param dir string
 --- @param direction string
 function M.toggle(count, size, dir, direction)
-  vim.validate({ count = { count, "number", true }, size = { size, "number", true } })
+  vim.validate({count = {count, "number", true}, size = {size, "number", true}})
   -- TODO this should toggle the specified term if any count is passed in
   if count >= 1 then
     toggle_nth_term(count, size, dir, direction)
@@ -252,50 +268,51 @@ function M.setup(user_prefs)
       "WinEnter",
       "term://*toggleterm#*",
       "nested", -- this is necessary in case the buffer is the last
-      "lua require'toggleterm'.handle_term_enter()",
+      "lua require'toggleterm'.handle_term_enter()"
     },
     {
       "WinLeave",
       "term://*toggleterm#*",
-      "lua require'toggleterm'.handle_term_leave()",
+      "lua require'toggleterm'.handle_term_leave()"
     },
     {
       "TermOpen",
       "term://*toggleterm#*",
-      "lua require'toggleterm'.on_term_open()",
-    },
+      "lua require'toggleterm'.on_term_open()"
+    }
   }
   if conf.shade_terminals then
     local is_bright = colors.is_bright_background()
 
     -- if background is light then darken the terminal a lot more to increase contrast
-    local factor = conf.shading_factor
-        and type(conf.shading_factor) == "number"
-        and conf.shading_factor
-      or (is_bright and 3 or 1)
+    local factor =
+      conf.shading_factor and type(conf.shading_factor) == "number" and conf.shading_factor or (is_bright and 3 or 1)
 
     local amount = factor * SHADING_AMOUNT
     colors.set_highlights(amount)
 
-    vim.list_extend(autocommands, {
+    vim.list_extend(
+      autocommands,
       {
-        -- call set highlights once on vim start
-        -- as this plugin might not be initialised till
-        -- after the colorscheme autocommand has fired
-        -- reapply highlights when the colorscheme
-        -- is re-applied
-        "ColorScheme",
-        "*",
-        fmt("lua require'toggleterm'.__set_highlights(%d)", amount),
-      },
-      {
-        "TermOpen",
-        "term://*",
-        "lua require('toggleterm').__apply_colors()",
-      },
-    })
+        {
+          -- call set highlights once on vim start
+          -- as this plugin might not be initialised till
+          -- after the colorscheme autocommand has fired
+          -- reapply highlights when the colorscheme
+          -- is re-applied
+          "ColorScheme",
+          "*",
+          fmt("lua require'toggleterm'.__set_highlights(%d)", amount)
+        },
+        {
+          "TermOpen",
+          "term://*",
+          "lua require('toggleterm').__apply_colors()"
+        }
+      }
+    )
   end
-  require("toggleterm.utils").create_augroups({ ToggleTerminal = autocommands })
+  require("toggleterm.utils").create_augroups({ToggleTerminal = autocommands})
 end
 
 return M
