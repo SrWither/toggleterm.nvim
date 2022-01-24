@@ -286,13 +286,13 @@ function M.setup(user_prefs)
       ":call Term()"
     },
     {
-      "BufEnter",
+      "WinEnter",
       "term://*toggleterm#*",
       "nested", -- this is necessary in case the buffer is the last
       ":call Term()"
     },
     {
-      "BufNew",
+      "WinNew",
       "term://*toggleterm#*",
       "nested", -- this is necessary in case the buffer is the last
       ":call Term()"
