@@ -231,7 +231,7 @@ function M.toggle(count, size, dir, direction)
     toggle_nth_term(count, size, dir, direction)
   else
     smart_toggle(count, size, dir, direction)
-    vim.cmd ":keepalt file Term"
+    -- vim.cmd ":keepalt file Term"
   end
 end
 
@@ -278,8 +278,20 @@ function M.setup(user_prefs)
     {
       "TermOpen",
       "term://*toggleterm#*",
-      "lua require'toggleterm'.on_term_open()"
-    }
+      "lua require'toggleterm'.on_term_open() \| :call Term()"
+    },
+    {
+      "BufEnter",
+      "term://*toggleterm#*",
+      "nested", -- this is necessary in case the buffer is the last
+      ":call Term()"
+    },
+    {
+      "BufNew",
+      "term://*toggleterm#*",
+      "nested", -- this is necessary in case the buffer is the last
+      ":call Term()"
+    },
   }
   if conf.shade_terminals then
     local is_bright = colors.is_bright_background()
