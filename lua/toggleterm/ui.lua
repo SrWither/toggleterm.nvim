@@ -150,7 +150,7 @@ function M.goto_previous()
 end
 
 function M.stopinsert()
-  vim.cmd("stopinsert!")
+  vim.cmd("startinsert")
 end
 
 --- @param win_id number
@@ -196,7 +196,7 @@ end
 local split_commands = {
   horizontal = {
     existing = "rightbelow vsplit",
-    new = "botright split",
+    new = "sp",
     resize = "resize",
   },
   vertical = {
