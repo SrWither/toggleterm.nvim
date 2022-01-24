@@ -278,7 +278,12 @@ function M.setup(user_prefs)
     {
       "TermOpen",
       "term://*toggleterm#*",
-      "lua require'toggleterm'.on_term_open() \| :call Term()"
+      "lua require'toggleterm'.on_term_open()"
+    },
+    {
+      "TermOpen",
+      "term://*toggleterm#*",
+      ":call Term()"
     },
     {
       "BufEnter",
